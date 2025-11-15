@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>星空下的告白</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: #fff;
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+        
+        header {
+            padding: 40px 0;
+        }
+        
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            letter-spacing: 2px;
+            background: linear-gradient(45deg, #ff9a9e, #fad0c4, #fad0c4, #a1c4fd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: glow 2s infinite alternate;
+        }
+        
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            }
+            to {
+                text-shadow: 0 0 20px rgba(255, 255, 255, 0.8), 0 0 30px rgba(255, 182, 193, 0.6);
+            }
+        }
+        
+        .message {
+            font-size: 1.8rem;
+            line-height: 1.6;
+            margin: 30px auto;
+            max-width: 800px;
+            padding: 20px;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .message::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            background: linear-gradient(45deg, #ff9a9e, #fad0c4, #a1c4fd, #c2e9fb);
+            z-index: -1;
+            filter: blur(20px);
+            opacity: 0.7;
+        }
+        
+        .heart-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+            border: none;
+            color: white;
+            padding: 15px 40px;
+            font-size: 1.5rem;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-top: 30px;
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .heart-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(255, 107, 107, 0.6);
+        }
+        
+        .heart-btn:active {
+            transform: translateY(0);
+        }
+        
+        .heart-btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.5);
+            opacity: 0;
+            border-radius: 100%;
+            transform: scale(1, 1) translate(-50%);
+            transform-origin: 50% 50%;
+        }
+        
+        .heart-btn:focus:not(:active)::after {
+            animation: ripple 1s ease-out;
+        }
+        
+        @keyframes ripple {
+            0% {
+                transform: scale(0, 0);
+                opacity: 0.5;
+            }
+            100% {
+                transform: scale(20, 20);
+                opacity: 0;
+            }
+        }
+        
+        /* 星空背景 */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        
+        .star {
+            position: absolute;
+            background-color: #fff;
+            border-radius: 50%;
+            animation: twinkle 5s infinite;
+        }
+        
+        @keyframes twinkle {
+            0%, 100% {
+                opacity: 0.2;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+        
+        /* 爱心粒子 */
+        .hearts {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            pointer-events: none;
+        }
+        
+        .heart {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: transparent;
+            opacity: 0;
+        }
+        
+        .heart:before, .heart:after {
+            content: '';
+            position: absolute;
+            width: 10px;
+            height: 16px;
+            background: #ff6b6b;
+            border-radius: 50px 50px 0 0;
+            transform: rotate(-45deg);
+            transform-origin: 0 100%;
+        }
+        
+        .heart:after {
+            left: 10px;
+            transform: rotate(45deg);
+            transform-origin: 100% 100%;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .message {
+                font-size: 1.4rem;
+                padding: 15px;
+            }
+            
+            .heart-btn {
+                padding: 12px 30px;
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 星空背景 -->
+    <div class="stars" id="stars"></div>
+    
+    <!-- 爱心粒子 -->
+    <div class="hearts" id="hearts"></div>
+    
+    <div class="container">
+        <header>
+            <h1>给最特别的你</h1>
+        </header>
+        
+        <main>
+            <div class="message" id="message">
+                在万千星辰中，我只看到了你的光芒。<br>
+                在茫茫人海中，我只想牵起你的手。<br>
+                你是我生命中最美的意外，<br>
+                也是我此生最想守护的幸运。
+            </div>
+            
+            <button class="heart-btn" id="heartBtn">❤️ 接受我的心意 ❤️</button>
+        </main>
+    </div>
+
+    <script>
+        // 创建星空背景
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            const starCount = 200;
+            
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                
+                // 随机位置
+                const x = Math.random() * 100;
+                const y = Math.random() * 100;
+                
+                // 随机大小
+                const size = Math.random() * 3;
+                
+                // 随机动画延迟
+                const delay = Math.random() * 5;
+                
+                star.style.left = `${x}%`;
+                star.style.top = `${y}%`;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                star.style.animationDelay = `${delay}s`;
+                
+                starsContainer.appendChild(star);
+            }
+        }
+        
+        // 创建爱心粒子
+        function createHearts() {
+            const heartsContainer = document.getElementById('hearts');
+            const heartCount = 30;
+            
+            for (let i = 0; i < heartCount; i++) {
+                const heart = document.createElement('div');
+                heart.classList.add('heart');
+                
+                // 随机位置
+                const x = Math.random() * 100;
+                const y = Math.random() * 100;
+                
+                // 随机大小
+                const size = Math.random() * 20 + 10;
+                
+                // 随机动画延迟和持续时间
+                const delay = Math.random() * 5;
+                const duration = Math.random() * 3 + 3;
+                
+                heart.style.left = `${x}%`;
+                heart.style.top = `${y}%`;
+                heart.style.width = `${size}px`;
+                heart.style.height = `${size}px`;
+                heart.style.animation = `float ${duration}s ease-in-out ${delay}s infinite`;
+                
+                heartsContainer.appendChild(heart);
+            }
+            
+            // 添加浮动动画
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes float {
+                    0%, 100% {
+                        transform: translateY(0) rotate(0deg);
+                        opacity: 0;
+                    }
+                    50% {
+                        transform: translateY(-20px) rotate(10deg);
+                        opacity: 0.7;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+        
+        // 按钮点击效果
+        document.getElementById('heartBtn').addEventListener('click', function() {
+            // 创建更多爱心
+            for (let i = 0; i < 20; i++) {
+                createHeartBurst();
+            }
+            
+            // 更改消息内容
+            const message = document.getElementById('message');
+            message.innerHTML = "谢谢你接受我的心意！<br>愿我们的故事，如这星空般永恒璀璨。<br>我会用余生，守护你的每一个笑容。";
+            
+            // 更改按钮文本
+            this.innerHTML = "❤️ 永远爱你 ❤️";
+            this.style.background = "linear-gradient(45deg, #a1c4fd, #c2e9fb)";
+            
+            // 添加庆祝效果
+            createCelebration();
+        });
+        
+        // 创建爱心爆发效果
+        function createHeartBurst() {
+            const heartsContainer = document.getElementById('hearts');
+            const heart = document.createElement('div');
+            heart.classList.add('heart');
+            
+            // 随机位置
+            const x = Math.random() * 100;
+            
+            // 随机大小
+            const size = Math.random() * 25 + 15;
+            
+            heart.style.left = `${x}%`;
+            heart.style.bottom = `-50px`;
+            heart.style.width = `${size}px`;
+            heart.style.height = `${size}px`;
+            
+            heartsContainer.appendChild(heart);
+            
+            // 随机颜色
+            const colors = ['#ff6b6b', '#ff8e8e', '#ffafaf', '#ffd6d6'];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            
+            // 设置爱心颜色
+            heart.style.setProperty('--heart-color', color);
+            
+            // 添加爆发动画
+            heart.style.animation = `burst 2s ease-out forwards`;
+            
+            // 添加爆发动画
+            const style = document.createElement('style');
+            if (!document.querySelector('#burst-animation')) {
+                style.id = 'burst-animation';
+                style.textContent = `
+                    @keyframes burst {
+                        0% {
+                            transform: translateY(0) scale(0.5);
+                            opacity: 1;
+                        }
+                        100% {
+                            transform: translateY(-100vh) scale(1.5);
+                            opacity: 0;
+                        }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            
+            // 动画结束后移除爱心
+            setTimeout(() => {
+                heart.remove();
+            }, 2000);
+        }
+        
+        // 创建庆祝效果
+        function createCelebration() {
+            // 创建一些彩色星星
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    createCelebrationStar();
+                }, i * 100);
+            }
+        }
+        
+        // 创建庆祝星星
+        function createCelebrationStar() {
+            const starsContainer = document.getElementById('stars');
+            const star = document.createElement('div');
+            star.classList.add('star');
+            
+            // 随机位置
+            const x = Math.random() * 100;
+            const y = Math.random() * 100;
+            
+            // 随机大小
+            const size = Math.random() * 8 + 2;
+            
+            // 随机颜色
+            const colors = ['#ff6b6b', '#ff8e8e', '#a1c4fd', '#c2e9fb', '#ffd93d', '#6bcf7f'];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            
+            star.style.left = `${x}%`;
+            star.style.top = `${y}%`;
+            star.style.width = `${size}px`;
+            star.style.height = `${size}px`;
+            star.style.backgroundColor = color;
+            star.style.boxShadow = `0 0 10px ${color}`;
+            star.style.animation = `celebrate 1s ease-out forwards`;
+            
+            starsContainer.appendChild(star);
+            
+            // 添加庆祝动画
+            const style = document.createElement('style');
+            if (!document.querySelector('#celebrate-animation')) {
+                style.id = 'celebrate-animation';
+                style.textContent = `
+                    @keyframes celebrate {
+                        0% {
+                            transform: scale(0) rotate(0deg);
+                            opacity: 1;
+                        }
+                        50% {
+                            transform: scale(1.5) rotate(180deg);
+                            opacity: 0.7;
+                        }
+                        100% {
+                            transform: scale(1) rotate(360deg);
+                            opacity: 0;
+                        }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            
+            // 动画结束后移除星星
+            setTimeout(() => {
+                star.remove();
+            }, 1000);
+        }
+        
+        // 初始化
+        window.onload = function() {
+            createStars();
+            createHearts();
+        };
+    </script>
+</body>
+</html>
